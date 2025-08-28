@@ -1,1 +1,15 @@
 build --@rules_rust//rust/toolchain/channel=nightly
+
+# Add Buildbarn remote execution configuration
+build:remote --remote_executor=grpc://localhost:8980
+build:remote --remote_instance_name=""
+build:remote --jobs=64
+build:remote --remote_timeout=3600
+build:remote --remote_download_toplevel
+build:remote --spawn_strategy=remote
+build:remote --strategy=Javac=remote
+build:remote --strategy=Closure=remote
+build:remote --genrule_strategy=remote
+
+# Make remote builds the default
+build --config=remote

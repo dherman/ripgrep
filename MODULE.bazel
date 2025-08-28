@@ -1,0 +1,37 @@
+module(
+    name = "ripgrep",
+)
+
+bazel_dep(name = "rules_rust", version = "0.63.0")
+bazel_dep(name = "bazel_skylib", version = "1.8.1")
+
+# Rust toolchain registration
+rust = use_extension("@rules_rust//rust:extensions.bzl", "rust")
+rust.toolchain(
+    edition = "2021",
+    versions = [
+        "1.89.0",
+        "nightly/2025-05-31",
+    ],
+)
+
+# Crate universe for Cargo dependencies
+crate = use_extension("@rules_rust//crate_universe:extension.bzl", "crate")
+crate.from_cargo(
+    name = "crate_index",
+    cargo_lockfile = "//:Cargo.lock",
+    lockfile = "//:cargo-bazel-lock.json",
+    manifests = [
+        "//:Cargo.toml",
+        "//:crates/cli/Cargo.toml",
+        "//:crates/globset/Cargo.toml",
+        "//:crates/grep/Cargo.toml",
+        "//:crates/ignore/Cargo.toml",
+        "//:crates/matcher/Cargo.toml",
+        "//:crates/pcre2/Cargo.toml",
+        "//:crates/printer/Cargo.toml",
+        "//:crates/regex/Cargo.toml",
+        "//:crates/searcher/Cargo.toml",
+    ],
+)
+use_repo(crate, "crate_index")

@@ -1,0 +1,78 @@
+load("@crate_index//:defs.bzl", "aliases", "all_crate_deps")
+load("@rules_rust//rust:defs.bzl", "rust_binary", "rust_test", "rust_doc_test")
+load("@rules_rust//cargo:defs.bzl", "cargo_build_script")
+
+exports_files(["rustfmt.toml"])
+
+cargo_build_script(
+    name = "build",
+    srcs = [
+        "build.rs",
+    ],
+    deps = all_crate_deps(
+        normal = True,
+        build = True,
+    ) + [
+        "//crates/grep",
+        "//crates/ignore",
+    ],
+    crate_root = "build.rs",
+)
+
+rust_binary(
+    name = "rg",
+    srcs = glob([
+        "crates/core/**/*.rs",
+    ]),
+    compile_data = [
+        "crates/core/flags/complete/encodings.sh",
+        "crates/core/flags/complete/rg.zsh",
+        "crates/core/flags/doc/template.long.help",
+        "crates/core/flags/doc/template.rg.1",
+        "crates/core/flags/doc/template.short.help",
+    ],
+    aliases = aliases(),
+    deps = all_crate_deps() + [
+        "//crates/grep",
+        "//crates/ignore",
+        ":build",
+    ],
+    proc_macro_deps = all_crate_deps(
+        proc_macro = True,
+    ),
+    visibility = ["//visibility:public"],
+)
+
+rust_test(
+    name = "tests",
+    crate = ":rg", 
+    deps = all_crate_deps(
+        normal_dev = True,
+    ),
+    proc_macro_deps = all_crate_deps(
+        proc_macro_dev = True,
+    ),
+)
+
+rust_test(
+    name = "integration",
+    srcs = glob([
+        "tests/**/*.rs",
+    ]),
+    deps = all_crate_deps(
+        normal = True,
+        normal_dev = True,
+    ),
+    data = glob([
+        "tests/data/**",
+    ]),
+    proc_macro_deps = all_crate_deps(
+        proc_macro_dev = True
+    ),
+    crate_root = "tests/tests.rs",
+)
+
+rust_doc_test(
+    name = "doctests",
+    crate = ":rg",
+)

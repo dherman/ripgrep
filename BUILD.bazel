@@ -76,3 +76,18 @@ rust_doc_test(
     name = "doctests",
     crate = ":rg",
 )
+
+filegroup(
+    name = "build_tools",
+    srcs = [],
+    # This forces building all the Rust toolchain and build script tools
+    tags = ["manual"],  # Won't be built by default
+)
+
+# Create an alias that depends on common build tools
+alias(
+    name = "prebuild_tools",
+    actual = "//external:rules_rust_tools",
+    tags = ["manual"],
+)
+

@@ -19,3 +19,6 @@ build:remote --remote_default_exec_properties=container-image=docker://ghcr.io/c
 # Make remote execution the default
 build --config=remote
 
+# Locally cache prebuilt tools
+build --repository_cache=~/.cache/bazel-repos
+fetch --repository_cache=~/.cache/bazel-repos
